@@ -1,17 +1,14 @@
 Django cookie consent
 =====================
 
-[![Build Status](https://travis-ci.com/bmihelac/django-cookie-consent.svg?branch=master)](https://travis-ci.com/bmihelac/django-cookie-consent)
 ![PyPI - License](https://img.shields.io/pypi/l/django-cookie-consent)
-[![PyPI](https://img.shields.io/pypi/v/django-cookie-consent)](https://pypi.python.org/pypi/django-cookie-consent)
-![PyPI](https://img.shields.io/pypi/pyversions/django-cookie-consent)
-![PyPI](https://img.shields.io/pypi/djversions/django-cookie-consent)
 
+This is a fork of [django-cookie-consent](https://pypi.org/project/django-cookie-consent/).
 
 django-cookie-consent is a reusable application for managing various
 cookies and visitors consent for their use in Django project.
 
-support ranges from django 1.9 to 3.0 and python 2.7 to 3.7
+support ranges from django 2.2 and python 3.7
 
 Features:
 
@@ -42,16 +39,6 @@ Configuration
 
 3. Include django-cookie-consent urls in ``urls.py``::
 
-    url(r'^cookies/', include('cookie_consent.urls'))
+    path('cookies/', include('cookie_consent.urls'))
 
 4. Run ``migrate`` django management command.
-
-
-Example app
------------
-
-::
-
-    cd tests && ./manage.py runserver
-
-Username and password for admin are 'administrator', 'password'.
