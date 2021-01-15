@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.contrib import admin
-from .conf import settings
 from .models import (
     Cookie,
+    CookieCategory,
     CookieGroup,
 )
+
+
+class CookieCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
 
 
 class CookieAdmin(admin.ModelAdmin):
@@ -27,3 +28,4 @@ class CookieGroupAdmin(admin.ModelAdmin):
 
 admin.site.register(Cookie, CookieAdmin)
 admin.site.register(CookieGroup, CookieGroupAdmin)
+admin.site.register(CookieCategory, CookieCategoryAdmin)
