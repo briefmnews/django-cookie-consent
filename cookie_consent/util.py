@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import datetime
 
+from django.utils import timezone
 from django.utils.encoding import smart_str
 
 from cookie_consent.cache import (
@@ -37,10 +38,14 @@ def get_cookie_dict_from_request(request):
     return parse_cookie_str(cookie_str)
 
 
-def set_cookie_dict_to_response(response, dic):
+def set_cookie_dict_to_response(response, dic, expiration_date=None):
+    if expiration_date:
+        max_age = settings.COOKIE_CONSENT_MAX_AGE - (timezone.now() - expiration_date).seconds
+    else:
+        max_age = settings.COOKIE_CONSENT_MAX_AGE
     response.set_cookie(settings.COOKIE_CONSENT_NAME,
                         dict_to_cookie_str(dic),
-                        settings.COOKIE_CONSENT_MAX_AGE)
+                        max_age)
 
 
 def get_cookie_value_from_request(request, varname, cookie=None):
