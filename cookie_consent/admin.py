@@ -3,6 +3,7 @@ from .models import (
     Cookie,
     CookieCategory,
     CookieGroup,
+    UserCookieConsent,
 )
 
 
@@ -26,6 +27,13 @@ class CookieGroupAdmin(admin.ModelAdmin):
     list_filter = ('is_required', 'is_deletable',)
 
 
+class UserCookieConsentAdmin(admin.ModelAdmin):
+    list_display = ("user", "action", "cookiegroup", "modified")
+    list_filter = ('cookiegroup',)
+    raw_id_fields = ("user",)
+
+
 admin.site.register(Cookie, CookieAdmin)
 admin.site.register(CookieGroup, CookieGroupAdmin)
 admin.site.register(CookieCategory, CookieCategoryAdmin)
+admin.site.register(UserCookieConsent, UserCookieConsentAdmin)
