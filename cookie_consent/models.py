@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import re
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import RegexValidator
+from django.contrib.auth import get_user_model
+
+from model_utils.models import TimeStampedModel
 
 from cookie_consent.cache import delete_cache
 
@@ -18,7 +18,32 @@ validate_cookie_name = RegexValidator(
     'invalid')
 
 
-class CookieGroup(models.Model):
+class DeleteAndSaveMixin:
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        delete_cache()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        delete_cache()
+
+
+class CookieCategory(DeleteAndSaveMixin, TimeStampedModel):
+    name = models.CharField(_('Name'), max_length=100)
+    description = models.TextField(_('Description'), blank=True, null=True)
+    ordering = models.IntegerField(_('Ordering'), default=0)
+
+    class Meta:
+        verbose_name = _('Cookie Category')
+        verbose_name_plural = _('Cookie Categories')
+        ordering = ['ordering']
+
+    def __str__(self):
+        return self.name
+
+
+class CookieGroup(DeleteAndSaveMixin, TimeStampedModel):
+    cookiecategory = models.ForeignKey(CookieCategory, verbose_name=CookieCategory._meta.verbose_name, on_delete=models.CASCADE)
     varname = models.CharField(
         _('Variable name'),
         max_length=32,
@@ -34,7 +59,6 @@ class CookieGroup(models.Model):
         help_text=_('Can cookies in this group be deleted.'),
         default=True)
     ordering = models.IntegerField(_('Ordering'), default=0)
-    created = models.DateTimeField(_('Created'), auto_now_add=True, blank=True)
 
     class Meta:
         verbose_name = _('Cookie Group')
@@ -50,16 +74,8 @@ class CookieGroup(models.Model):
         except IndexError:
             return ""
 
-    def delete(self, *args, **kwargs):
-        super(CookieGroup, self).delete(*args, **kwargs)
-        delete_cache()
 
-    def save(self, *args, **kwargs):
-        super(CookieGroup, self).save(*args, **kwargs)
-        delete_cache()
-
-
-class Cookie(models.Model):
+class Cookie(DeleteAndSaveMixin, TimeStampedModel):
     cookiegroup = models.ForeignKey(
         CookieGroup,
         verbose_name=CookieGroup._meta.verbose_name,
@@ -68,7 +84,6 @@ class Cookie(models.Model):
     description = models.TextField(_('Description'), blank=True)
     path = models.TextField(_('Path'), blank=True, default="/")
     domain = models.CharField(_('Domain'), max_length=250, blank=True)
-    created = models.DateTimeField(_('Created'), auto_now_add=True, blank=True)
 
     class Meta:
         verbose_name = _('Cookie')
@@ -85,14 +100,6 @@ class Cookie(models.Model):
     def get_version(self):
         return self.created.isoformat()
 
-    def delete(self, *args, **kwargs):
-        super(Cookie, self).delete(*args, **kwargs)
-        delete_cache()
-
-    def save(self, *args, **kwargs):
-        super(Cookie, self).save(*args, **kwargs)
-        delete_cache()
-
 
 ACTION_ACCEPTED = 1
 ACTION_DECLINED = -1
@@ -102,18 +109,20 @@ ACTION_CHOICES = (
 )
 
 
-class LogItem(models.Model):
+class UserCookieConsent(TimeStampedModel):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     action = models.IntegerField(_('Action'), choices=ACTION_CHOICES)
     cookiegroup = models.ForeignKey(
         CookieGroup,
         verbose_name=CookieGroup._meta.verbose_name,
         on_delete=models.CASCADE)
     version = models.CharField(_('Version'), max_length=32)
-    created = models.DateTimeField(_('Created'), auto_now_add=True, blank=True)
+
     def __str__(self):
         return "%s %s" % (self.cookiegroup.name, self.version)
 
     class Meta:
-        verbose_name = _('Log item')
-        verbose_name_plural = _('Log items')
+        verbose_name = _('User cookie consent')
+        verbose_name_plural = _('User cookie consents')
         ordering = ['-created']
+        unique_together = ['user', 'cookiegroup']
