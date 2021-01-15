@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.utils.encoding import smart_str
 
 from cookie_consent.cache import all_cookie_groups
@@ -11,15 +8,16 @@ from cookie_consent.util import (
 from cookie_consent.conf import settings
 
 
-class CleanCookiesMiddleware(object):
+class CleanCookiesMiddleware:
     """
-    Clean declined cookies or non accepted cookies if not
-    COOKIE_CONSENT_OPT_OUT set.
+    Clean declined cookies
     """
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def process_response(self, request, response):
+    def __call__(self, request):
+        response = self.get_response(request)
+
         if not is_cookie_consent_enabled(request):
             return response
         cookie_dic = get_cookie_dict_from_request(request)
@@ -33,9 +31,10 @@ class CleanCookiesMiddleware(object):
                 if group_version == settings.COOKIE_CONSENT_DECLINE:
                     response.delete_cookie(smart_str(cookie.name),
                                            cookie.path, cookie.domain)
-                if group_version < cookie.get_version() and not settings.COOKIE_CONSENT_OPT_OUT:
+                if group_version < cookie.get_version():
                     response.delete_cookie(
                         smart_str(cookie.name),
                         cookie.path, cookie.domain
                     )
+
         return response
