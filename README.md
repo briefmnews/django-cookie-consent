@@ -42,3 +42,11 @@ Configuration
     path('cookies/', include('cookie_consent.urls'))
 
 4. Run ``migrate`` django management command.
+
+
+Configuration
+-------------
+Tests can be run with the following command:
+```
+make test
+```
