@@ -13,7 +13,7 @@ from cookie_consent.cache import (
 from cookie_consent.models import (
     ACTION_ACCEPTED,
     ACTION_DECLINED,
-    LogItem,
+    UserCookieConsent,
 )
 from cookie_consent.conf import settings
 
@@ -92,10 +92,10 @@ def accept_cookies(request, response, varname=None):
     cookie_dic = get_cookie_dict_from_request(request)
     for cookie_group in get_cookie_groups(varname):
         cookie_dic[cookie_group.varname] = cookie_group.get_version()
-        if settings.COOKIE_CONSENT_LOG_ENABLED:
-            LogItem.objects.create(action=ACTION_ACCEPTED,
+        if request.user.is_authenticated:
+            UserCookieConsent.objects.update_or_create(
                                 cookiegroup=cookie_group,
-                                version=cookie_group.get_version())
+                                user=request.user, defaults={"action": ACTION_ACCEPTED, "version": cookie_group.get_version()})
     set_cookie_dict_to_response(response, cookie_dic)
 
 
@@ -114,10 +114,10 @@ def decline_cookies(request, response, varname=None):
     for cookie_group in get_cookie_groups(varname):
         cookie_dic[cookie_group.varname] = settings.COOKIE_CONSENT_DECLINE
         delete_cookies(response, cookie_group)
-        if settings.COOKIE_CONSENT_LOG_ENABLED:
-            LogItem.objects.create(action=ACTION_DECLINED,
+        if request.user.is_authenticated:
+            UserCookieConsent.objects.update_or_create(
                                 cookiegroup=cookie_group,
-                                version=cookie_group.get_version())
+                                user=request.user, defaults={"action": ACTION_DECLINED, "version": cookie_group.get_version()})
     set_cookie_dict_to_response(response, cookie_dic)
 
 

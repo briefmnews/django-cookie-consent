@@ -6,7 +6,6 @@ from .conf import settings
 from .models import (
     Cookie,
     CookieGroup,
-    LogItem,
 )
 
 
@@ -26,14 +25,5 @@ class CookieGroupAdmin(admin.ModelAdmin):
     list_filter = ('is_required', 'is_deletable',)
 
 
-class LogItemAdmin(admin.ModelAdmin):
-    list_display = ('action', 'cookiegroup', 'version', 'created')
-    list_filter = ('action', 'cookiegroup')
-    readonly_fields = ('action', 'cookiegroup', 'version', 'created')
-    date_hierarchy = 'created'
-
-
 admin.site.register(Cookie, CookieAdmin)
 admin.site.register(CookieGroup, CookieGroupAdmin)
-if settings.COOKIE_CONSENT_LOG_ENABLED:
-    admin.site.register(LogItem, LogItemAdmin)
