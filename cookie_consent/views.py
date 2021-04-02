@@ -91,6 +91,12 @@ class CookieGroupFormView(FormView):
     template_name = "cookie_consent/cookiegroup_list.html"
     form_class = CookieGroupForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["action_accepted"] = ACTION_ACCEPTED
+        context["action_declined"] = ACTION_DECLINED
+        return context
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request

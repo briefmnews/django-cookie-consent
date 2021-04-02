@@ -1,10 +1,11 @@
 {% load cookie_consent_tags %}
-<div>
+<div class="choice">
     <div class="toggle-item">
         <div class="IconToggle {% if widget.attrs.initial %}has-value{% endif %}">
-            <input {% if widget.attrs.initial == 1 %}checked{% endif %}
+            <input type="number" value="0" name="{{ widget.name }}">
+            <input {% if widget.attrs.initial == widget.attrs.action_accepted %}checked{% endif %}
                    {% if widget.attrs.cookie_group.is_required %}disabled{% endif %}
-                   required="required" type="checkbox" name="{{ widget.name }}"
+                   required="required" type="checkbox" name="{{ widget.name }}_checkbox"
                     tabindex="0"
                     id="{{ widget.attrs.id }}"
                     class="IconToggle__checkbox" value="{{ widget.attrs.initial }}"><label for="{{ widget.attrs.id }}"
@@ -13,4 +14,5 @@
         <p><strong>{{ widget.attrs.cookie_group.name }}</strong></p>
     </div>
     <p>{{ widget.attrs.cookie_group.description }}</p>
+    <p class="error-message"> Ce champ est obligatoire </p>
 </div>
