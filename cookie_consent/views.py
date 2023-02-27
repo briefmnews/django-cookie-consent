@@ -49,19 +49,13 @@ class CookieGroupBaseProcessView(View):
 
     def post(self, request, *args, **kwargs):
         varname = kwargs.get('varname', None)
-        if request.is_ajax():
-            response = HttpResponse()
-        else:
-            response = HttpResponseRedirect(self.get_success_url())
+        response = HttpResponseRedirect(self.get_success_url())
         self.process(request, response, varname)
         return response
 
     def get(self, request, *args, **kwargs):
         varname = kwargs.get('varname', None)
-        if request.is_ajax():
-            response = HttpResponse()
-        else:
-            response = HttpResponseRedirect(self.get_success_url())
+        response = HttpResponseRedirect(self.get_success_url())
         self.process(request, response, varname)
         return response
 
