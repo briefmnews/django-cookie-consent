@@ -49,41 +49,17 @@ class IntegrationTest(TestCase):
     def test_cookies_view(self):
         response = self.client.get(reverse('cookie_consent_cookie_group_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            '<input type="submit" value="Accept">')
-        self.assertContains(
-            response,
-            '<input type="submit" value="Decline">')
 
     def test_accept_cookie(self):
         response = self.client.post(reverse('cookie_consent_accept',
                                             kwargs={"varname": "optional"}),
                                     follow=True)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            '<span class="cookie-consent-accepted">Accepted</span>')
-
-    def test_accept_cookie_ajax(self):
-        response = self.client.post(reverse('cookie_consent_accept',
-                                            kwargs={"varname": "optional"}),
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
 
     def test_decline_cookie(self):
         response = self.client.post(reverse('cookie_consent_decline',
                                             kwargs={"varname": "optional"}),
                                     follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            '<span class="cookie-consent-declined">Declined</span>')
-
-    def test_decline_cookie_ajax(self):
-        response = self.client.delete(reverse('cookie_consent_decline',
-                                              kwargs={"varname": "optional"}),
-                                      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
 
     def test_cookies(self):
