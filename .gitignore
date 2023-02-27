@@ -10,3 +10,5 @@ dist/
 .vscode
 .history
 .sonarlint
+.idea
+.python-version
