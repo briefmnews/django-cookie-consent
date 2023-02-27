@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import urllib
 
 from django.utils.encoding import smart_str
 
@@ -23,6 +24,7 @@ def parse_cookie_str(cookie):
     dic = {}
     if not cookie:
         return dic
+    cookie = urllib.parse.unquote(cookie).lstrip("\"").rstrip("\"")
     for c in cookie.split("|"):
         key, value = c.split("=")
         dic[key] = value
